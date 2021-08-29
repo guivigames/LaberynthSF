@@ -62,12 +62,28 @@ char Tiles::GetTile(int x, int y)
 /// MAP MEMBER FUNCTIONS ///////////////////////////
 GameMap::GameMap()
 {
-    m_tiles = new Tiles[m_width * m_height];
+    CreateTiles();
+    CreateMap();
+}
+
+GameMap::~GameMap()
+{
+    delete [] m_tiles;
+}
+
+void GameMap::CreateTiles()
+{
     srand(time(nullptr));
     
+    m_tiles = new Tiles[m_width * m_height];
+
     for (int i = 0; i < m_width * m_height; i++){
         m_tiles[i].Set( (TileType)(rand() % 10));
     }
+}
+
+void GameMap::CreateMap()
+{
     m_map = "";
 
     for (int h = 0; h < m_height; h++){
@@ -88,17 +104,6 @@ GameMap::GameMap()
             }
         }
     }
-    // (int y = 0; y < m_totalheight; y++){
-    //    for (int x = 0; x < m_totalwidth; x++){
-    //        std::cout << GetTile(x, y);
-    //    }
-    //    std::cout << std::endl;
-    //}
-}
-
-GameMap::~GameMap()
-{
-    delete [] m_tiles;
 }
 
 sf::Sprite&  GameMap::GetStripe(int x, int y)

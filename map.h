@@ -59,6 +59,8 @@ private:
 public:
     GameMap();
     ~GameMap();
+    void CreateTiles();
+    void CreateMap();
     int GetTotalWidth(){return m_totalwidth;};
     int GetTotalHeigt(){return m_totalheight;};
     sf::Sprite& GetStripe(int x, int y);

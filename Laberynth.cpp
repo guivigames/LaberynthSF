@@ -64,7 +64,10 @@ struct player
     float fRadius = 0.5;
 };
 
-
+struct arrow
+{
+    sf::Vector2f m_vertex[3];
+};
 
 int main()
 {
