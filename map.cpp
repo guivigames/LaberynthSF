@@ -62,10 +62,10 @@ char Tiles::GetTile(int x, int y)
 /// MAP MEMBER FUNCTIONS ///////////////////////////
 GameMap::GameMap()
 {
-    m_width     = 10;
-    m_height    = 10;
-    m_totalwidth    = 30;
-    m_totalheight   = 30;
+    m_width     = 9;
+    m_height    = 9;
+    m_totalwidth    = m_width*3;
+    m_totalheight   = m_height*3;
     m_pxWidth   = m_width * 16;     ///< Width of the map in pixels
     m_pxHeight  = m_height *16;     ///< height of the map in piels
     

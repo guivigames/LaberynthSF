@@ -49,12 +49,12 @@ public:
 class GameMap
 {
 private:
-    int m_width     = 10;
-    int m_height    = 10;
+    int m_width;
+    int m_height;
     int m_pxWidth;
     int m_pxHeight;
-    int m_totalwidth    = 30;
-    int m_totalheight   = 30;
+    int m_totalwidth;
+    int m_totalheight;
     Tiles* m_tiles;
     std::string m_map;
     sf::Sprite m_MapStrip[900];

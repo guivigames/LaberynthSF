@@ -25,6 +25,12 @@ sf::Vector2<T> operator*(const sf::Vector2<T>& left, const sf::Vector2<T>& right
     return sf::Vector2<T>(X,Y);
 }
 template <typename T>
+sf::Vector2i floor(const sf::Vector2<T>& vector)
+{
+    int X = floor(vector.x);
+    int Y = floor(vector.y);
+    return sf::Vector2i(X,Y);
+}
 
 // CIRCLE/RECTANGLE
 bool circleRect(float cx, float cy, float rad, float rx, float ry, float rw, float rh) 
@@ -100,7 +106,7 @@ int main()
     ///< Arrow positions.
     {
         co = 0;
-        int pwHeight = 30;
+        int pwHeight = _map->GetTotalHeigt();
         for (int i = 3; i < pwHeight; i+= 6){
             int row = i;
             int halfrow = 1.5;
@@ -178,12 +184,12 @@ int main()
             }
         }*/
 
-        sf::Vector2i currentCell = {floor(_playerOne.m_vPos.x), floor(_playerOne.m_vPos.y)};
-        sf::Vector2i targetCell = {floor(vPotentilPos.x), floor(vPotentilPos.y)};
+        sf::Vector2i currentCell = floor(_playerOne.m_vPos);//{floor(_playerOne.m_vPos.x), floor(_playerOne.m_vPos.y)};
+        sf::Vector2i targetCell = floor(vPotentilPos);//{floor(vPotentilPos.x), floor(vPotentilPos.y)};
         sf::Vector2i vAreaTL = {std::max( std::min(currentCell.x, targetCell.x)-1, 0), 
                                 std::max( std::min(currentCell.y, targetCell.y)-1, 0)};
-        sf::Vector2i vAreaBR = {std::min( std::max(currentCell.x, targetCell.x)+1, 30), 
-                                std::min( std::max(currentCell.y, targetCell.y)+1, 30)};
+        sf::Vector2i vAreaBR = {std::min( std::max(currentCell.x, targetCell.x)+1, _map->GetTotalWidth()), 
+                                std::min( std::max(currentCell.y, targetCell.y)+1, _map->GetTotalHeigt())};
         sf::Vector2f vRayToNearest;
         sf::Vector2i vCell;
 
