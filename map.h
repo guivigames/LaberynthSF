@@ -49,13 +49,16 @@ public:
 class GameMap
 {
 private:
-    int m_width = 10;
-    int m_height =10;
-    int m_totalwidth = 30;
-    int m_totalheight = 30;
+    int m_width     = 10;
+    int m_height    = 10;
+    int m_pxWidth;
+    int m_pxHeight;
+    int m_totalwidth    = 30;
+    int m_totalheight   = 30;
     Tiles* m_tiles;
     std::string m_map;
     sf::Sprite m_MapStrip[900];
+
 public:
     GameMap();
     ~GameMap();
@@ -63,8 +66,10 @@ public:
     void CreateMap();
     int GetTotalWidth(){return m_totalwidth;};
     int GetTotalHeigt(){return m_totalheight;};
-    sf::Sprite& GetStripe(int x, int y);
-    char GetTile(int x, int y);
+    int GetPxWidth(){ return m_pxWidth;};   ///< Return the width in pixels of the map.
+    int GetPxHeight(){ return m_pxHeight;}; ///< Return the height in pixels of the map.
+    sf::Sprite& GetStripe(int x, int y);    ///< a strip in of a position x, y in the tile grid.
+    char GetTile(int x, int y);         ///< get te tile as as character.
 };
 
 #endif

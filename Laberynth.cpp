@@ -16,6 +16,16 @@ const int width = 800;
 const int height = 600;
 const float radius = 8;
 
+///< My definitions of SFML vector mathematics.
+template <typename T>
+sf::Vector2<T> operator*(const sf::Vector2<T>& left, const sf::Vector2<T>& right)
+{
+    T X = left.x * right.x;
+    T Y = left.y * right.y;
+    return sf::Vector2<T>(X,Y);
+}
+template <typename T>
+
 // CIRCLE/RECTANGLE
 bool circleRect(float cx, float cy, float rad, float rx, float ry, float rw, float rh) 
 {
@@ -84,17 +94,23 @@ int main()
     sf::ConvexShape _arrows[4][5];
     player _playerOne;
     sf::Vector2f _scale = {16.0f, 16.0f};
-    sf::Vector2f _mapOffest = {40.0, 40.0};
+    sf::Vector2f _mapOffest = {3.0, 3.0};
+    int co = 0;
 
     ///< Arrow positions.
     {
-        int row = _scale.y*3;
-        int halfrow = _scale.y+(_scale.y/2);
-        _arrows[0][0].setPointCount(3);
-        _arrows[0][0].setPoint(0, sf::Vector2f( 10.0, _mapOffest.y+row));
-        _arrows[0][0].setPoint(1, sf::Vector2f( 30.0, _mapOffest.y+row+halfrow));
-        _arrows[0][0].setPoint(2, sf::Vector2f( 10.0, _mapOffest.y+(2*row)));
-        _arrows[0][0].setFillColor(sf::Color::Green);
+        co = 0;
+        int pwHeight = 30;
+        for (int i = 3; i < pwHeight; i+= 6){
+            int row = i;
+            int halfrow = 1.5;
+            _arrows[0][co].setPointCount(3);
+            _arrows[0][co].setPoint(0, sf::Vector2f( 1, _mapOffest.y+row)*_scale);
+            _arrows[0][co].setPoint(1, sf::Vector2f( 2, _mapOffest.y+row+halfrow)*_scale);
+            _arrows[0][co].setPoint(2, sf::Vector2f( 1, _mapOffest.y+row+(2*halfrow))* _scale);
+            _arrows[0][co].setFillColor(sf::Color::Green);
+            co++;
+        }
     }
     ///< Player Initial position.
     _playerOne.m_vPos = sf::Vector2f(1.0+_playerOne.fRadius, 1.0+_playerOne.fRadius);
@@ -201,7 +217,7 @@ int main()
         for (int y = 0; y < 30; y++){
             for (int x = 0; x < 30; x++){
                 auto& sprite = _map->GetStripe(x, y);
-                sprite.setPosition(sf::Vector2f(x*_scale.x, y*_scale.y)+_mapOffest); // absolute position
+                sprite.setPosition(sf::Vector2f(x*_scale.x, y*_scale.y)+(_mapOffest*_scale)); // absolute position
                 window.draw(sprite);
             }
         }
@@ -210,11 +226,12 @@ int main()
         sf::CircleShape _circl;
         _circl.setRadius(_playerOne.fRadius*_scale.x);
         _circl.setPosition(sf::Vector2f((_playerOne.m_vPos.x-_playerOne.fRadius)*_scale.x,
-                            (_playerOne.m_vPos.y-_playerOne.fRadius)*_scale.y) +_mapOffest);
+                            (_playerOne.m_vPos.y-_playerOne.fRadius)*_scale.y) +(_mapOffest*_scale));
         _circl.setFillColor(sf::Color::Red);
         window.draw(_circl);
         
-        window.draw(_arrows[0][0]);
+        for (int i = 0; i < co; i++)
+            window.draw(_arrows[0][i]);
 
         window.display();
         
