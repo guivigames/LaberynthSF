@@ -64,11 +64,6 @@ struct player
     float fRadius = 0.5;
 };
 
-struct arrow
-{
-    sf::Vector2f m_vertex[3];
-};
-
 int main()
 {
     srand(time(NULL));
@@ -86,10 +81,22 @@ int main()
     sf::Clock gameTime;
 
     GameMap *_map = new GameMap();
+    sf::ConvexShape _arrows[4][5];
     player _playerOne;
     sf::Vector2f _scale = {16.0f, 16.0f};
     sf::Vector2f _mapOffest = {40.0, 40.0};
 
+    ///< Arrow positions.
+    {
+        int row = _scale.y*3;
+        int halfrow = _scale.y+(_scale.y/2);
+        _arrows[0][0].setPointCount(3);
+        _arrows[0][0].setPoint(0, sf::Vector2f( 10.0, _mapOffest.y+row));
+        _arrows[0][0].setPoint(1, sf::Vector2f( 30.0, _mapOffest.y+row+halfrow));
+        _arrows[0][0].setPoint(2, sf::Vector2f( 10.0, _mapOffest.y+(2*row)));
+        _arrows[0][0].setFillColor(sf::Color::Green);
+    }
+    ///< Player Initial position.
     _playerOne.m_vPos = sf::Vector2f(1.0+_playerOne.fRadius, 1.0+_playerOne.fRadius);
 
     int score = 0;
@@ -206,6 +213,8 @@ int main()
                             (_playerOne.m_vPos.y-_playerOne.fRadius)*_scale.y) +_mapOffest);
         _circl.setFillColor(sf::Color::Red);
         window.draw(_circl);
+        
+        window.draw(_arrows[0][0]);
 
         window.display();
         
