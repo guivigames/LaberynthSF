@@ -213,15 +213,15 @@ int main()
                 }
             }
         }
-        if (vPotentilPos.x > 0 && vPotentilPos.x < 30)
+        if (vPotentilPos.x > 0 && vPotentilPos.x < _map->GetTotalWidth())
             _playerOne.m_vPos.x = vPotentilPos.x;// - _playerOne.fRadius;
-        if (vPotentilPos.y > 0 && vPotentilPos.y < 30)
+        if (vPotentilPos.y > 0 && vPotentilPos.y < _map->GetTotalHeigt())
             _playerOne.m_vPos.y = vPotentilPos.y;//- _playerOne.fRadius;
         ///< Draw Everyting.
         window.clear();
         
-        for (int y = 0; y < 30; y++){
-            for (int x = 0; x < 30; x++){
+        for (int y = 0; y < _map->GetTotalHeigt(); y++){
+            for (int x = 0; x < _map->GetTotalWidth(); x++){
                 auto& sprite = _map->GetStripe(x, y);
                 sprite.setPosition(sf::Vector2f(x*_scale.x, y*_scale.y)+(_mapOffest*_scale)); // absolute position
                 window.draw(sprite);
