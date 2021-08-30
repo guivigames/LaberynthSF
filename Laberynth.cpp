@@ -75,7 +75,25 @@ bool circleCircle(float c1x, float c1y, float c1r, float c2x, float c2y, float c
   }
   return false;
 }
+// TRIANGLE/POINT
+bool triPoint(float x1, float y1, float x2, float y2, float x3, float y3, float px, float py) {
 
+  // get the area of the triangle
+  float areaOrig = abs( (x2-x1)*(y3-y1) - (x3-x1)*(y2-y1) );
+
+  // get the area of 3 triangles made between the point
+  // and the corners of the triangle
+  float area1 =    abs( (x1-px)*(y2-py) - (x2-px)*(y1-py) );
+  float area2 =    abs( (x2-px)*(y3-py) - (x3-px)*(y2-py) );
+  float area3 =    abs( (x3-px)*(y1-py) - (x1-px)*(y3-py) );
+
+  // if the sum of the three areas equals the original,
+  // we're inside the triangle!
+  if (area1 + area2 + area3 == areaOrig) {
+    return true;
+  }
+  return false;
+}
 
 ///< Object definitions.
 struct player
@@ -250,9 +268,21 @@ int main()
         _circl.setFillColor(sf::Color::Red);
         window.draw(_circl);
         
+        //sf::Vector2i _mousePos = sf::Mouse::getPosition(window);
+        // get the current mouse position in the window
+        sf::Vector2i pixelPos = sf::Mouse::getPosition(window);
+        // convert it to world coordinates
+        sf::Vector2f worldPos = window.mapPixelToCoords(pixelPos);
         for (int j = 0; j < 4; j++)
             for (int i = 0; i < numarrows; i++)
+            {
+                if (triPoint(_arrows[j][i].getPoint(0).x, _arrows[j][i].getPoint(0).y, _arrows[j][i].getPoint(1).x,
+                _arrows[j][i].getPoint(1).y, _arrows[j][i].getPoint(2).x, _arrows[j][i].getPoint(2).y, worldPos.x, worldPos.y))
+                    _arrows[j][i].setFillColor(sf::Color::Red);
+                else 
+                    _arrows[j][i].setFillColor(sf::Color::Green);
                 window.draw(_arrows[j][i]);
+            }
 
         window.display();
         
