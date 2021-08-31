@@ -127,3 +127,17 @@ char GameMap::GetTile(int x, int y)
     }
     else return '?';
 }
+
+/// @brief Move the specific row one section left
+void GameMap::MoveTilesLeft(int x)
+{
+    int h = (2*x)+1;
+    // store first tile.
+    Tiles temp = m_tiles[(h * m_width) + 0];
+    for(int w = 1; w < m_width-1; w++)
+        m_tiles[(h * m_width) + w] = m_tiles[(h * m_width) + (w + 1)];
+    m_tiles[(h * m_width) + (m_width - 1)] = temp;
+    CreateMap();
+}
+
+

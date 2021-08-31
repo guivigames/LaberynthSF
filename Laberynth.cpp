@@ -273,12 +273,17 @@ int main()
         sf::Vector2i pixelPos = sf::Mouse::getPosition(window);
         // convert it to world coordinates
         sf::Vector2f worldPos = window.mapPixelToCoords(pixelPos);
-        for (int j = 0; j < 4; j++)
+        for (int j = 0; j < 2; j++)
             for (int i = 0; i < numarrows; i++)
             {
                 if (triPoint(_arrows[j][i].getPoint(0).x, _arrows[j][i].getPoint(0).y, _arrows[j][i].getPoint(1).x,
-                _arrows[j][i].getPoint(1).y, _arrows[j][i].getPoint(2).x, _arrows[j][i].getPoint(2).y, worldPos.x, worldPos.y))
+                _arrows[j][i].getPoint(1).y, _arrows[j][i].getPoint(2).x, _arrows[j][i].getPoint(2).y, worldPos.x, worldPos.y)){
                     _arrows[j][i].setFillColor(sf::Color::Red);
+                    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
+                        {
+                            _map->MoveTilesLeft(i);
+                        }
+                }
                 else 
                     _arrows[j][i].setFillColor(sf::Color::Green);
                 window.draw(_arrows[j][i]);

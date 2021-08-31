@@ -70,6 +70,7 @@ public:
     int GetPxHeight(){ return m_pxHeight;}; ///< Return the height in pixels of the map.
     sf::Sprite& GetStripe(int x, int y);    ///< a strip in of a position x, y in the tile grid.
     char GetTile(int x, int y);         ///< get te tile as as character.
+    void MoveTilesLeft(int x);
 };
 
 #endif
