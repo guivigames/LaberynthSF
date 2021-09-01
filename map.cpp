@@ -1,7 +1,7 @@
 #include "map.h"
 #include <iostream>
 
-/// TILES MEMBER FUNCTIONS /////////////////////////
+/// TILES MEMBER FUNCTIONS ////////////////////////////////////////
 void Tiles::SetHoryzontal(){m_tiles = "###XXX###";};
 void Tiles::SetVertical(){  m_tiles = "#X##X##X#";};
 void Tiles::SetTRight(){    m_tiles = "#X##XX#X#";};
@@ -12,6 +12,7 @@ void Tiles::SetTopLeft(){   m_tiles = "####XX#X#";};
 void Tiles::SetTopRight(){  m_tiles = "###XX##X#";};
 void Tiles::SetBottomLeft(){m_tiles = "#X##XX###";};
 void Tiles::SetBottomRight(){m_tiles = "#X#XX####";};
+void Tiles::MakeEnd(){m_tiles[4] = 'E';};
 Tiles::Tiles(){}
 Tiles::~Tiles(){}
 void Tiles::Set(TileType type)
@@ -59,26 +60,29 @@ char Tiles::GetTile(int x, int y)
     else return '?';
 }
 
-/// MAP MEMBER FUNCTIONS ///////////////////////////
+/// MAP MEMBER FUNCTIONS //////////////////////////////////////////
+/// @brief Default contructor
 GameMap::GameMap()
 {
-    m_width     = 9;
-    m_height    = 9;
-    m_totalwidth    = m_width*3;
-    m_totalheight   = m_height*3;
-    m_pxWidth   = m_width * 16;     ///< Width of the map in pixels
-    m_pxHeight  = m_height *16;     ///< height of the map in piels
-    
+    m_width     = 9;                ///< number of regions in the width direction.
+    m_height    = 9;                ///< number of regions in the height direction.
+    m_totalwidth    = m_width*3;    ///< numer of tiles on width.
+    m_totalheight   = m_height*3;   ///< number of tiles on height.
+    m_pxWidth   = m_width * 16;     ///< Width of the map in pixels.
+    m_pxHeight  = m_height *16;     ///< height of the map in piels.
     
     CreateTiles();
     CreateMap();
 }
 
+/// @brief destructor
 GameMap::~GameMap()
 {
     delete [] m_tiles;
 }
 
+/// @brief creates all the tiles in all the regions. a region
+/// is a 3 y 3 tiled area.
 void GameMap::CreateTiles()
 {
     srand(time(nullptr));
@@ -88,8 +92,11 @@ void GameMap::CreateTiles()
     for (int i = 0; i < m_width * m_height; i++){
         m_tiles[i].Set( (TileType)(rand() % 10));
     }
+    m_tiles[(m_width * m_height) -1].MakeEnd();
 }
 
+/// @brief Makes the map on a single std::String of the generated tiles. 
+/// This way it is much easier for searching later on.
 void GameMap::CreateMap()
 {
     m_map = "";
@@ -104,9 +111,13 @@ void GameMap::CreateMap()
                         m_MapStrip[m_map.size()-1].setTextureRect(sf::IntRect(16, 16, 16, 16));
                         //printf("wall\r\n");
                     }
-                    else {
+                    else if (m_tiles[(h * m_width) + w].GetTile(x, y) == 'X'){
                         m_MapStrip[m_map.size()-1].setTextureRect(sf::IntRect( 0, 32, 16, 16));
                          //printf("Path\r\n");
+                    }
+                    else if (m_tiles[(h * m_width) + w].GetTile(x, y) == 'E'){
+                        m_MapStrip[m_map.size()-1].setTextureRect(sf::IntRect(32, 0, 16, 16));
+                        //printf("wall\r\n");
                     }
                 }
             }
@@ -114,11 +125,13 @@ void GameMap::CreateMap()
     }
 }
 
+/// @brief Gets the stripe of the tile for drawing
 sf::Sprite&  GameMap::GetStripe(int x, int y)
 {
     return m_MapStrip[ (y * m_totalwidth) + x];
 }
 
+/// @brief Gets the chracte of the specific tile
 char GameMap::GetTile(int x, int y)
 {
     if (x < m_totalwidth && x < m_totalheight)
@@ -132,12 +145,61 @@ char GameMap::GetTile(int x, int y)
 void GameMap::MoveTilesLeft(int x)
 {
     int h = (2*x)+1;
-    // store first tile.
-    Tiles temp = m_tiles[(h * m_width) + 0];
-    for(int w = 1; w < m_width-1; w++)
+    // store first tile in row.
+    Tiles temp = m_tiles[(h * m_width)];
+    for(int w = 0; w < m_width-1; w++){
         m_tiles[(h * m_width) + w] = m_tiles[(h * m_width) + (w + 1)];
-    m_tiles[(h * m_width) + (m_width - 1)] = temp;
+        //std::cout << (h * m_width) + w << " ";
+    }
+    //std::cout << x << " " << h << std::endl;
+    m_tiles[(h * m_width) + (m_width-1)] = temp;
     CreateMap();
 }
 
+/// @brief Move the specific row one section Right
+void GameMap::MoveTilesRight(int x)
+{
+    int h = (2*x)+1;
+    // store first tile in row.
+    Tiles temp = m_tiles[(h * m_width) + (m_width-1)];
+    for(int w = m_width-1; w > 0; w--){
+        m_tiles[(h * m_width) + w] = m_tiles[(h * m_width) + (w - 1)];
+        //std::cout << (h * m_width) + w << " ";
+    }
+    //std::cout << x << " " << h << std::endl;
+    m_tiles[(h * m_width)] = temp;
+    CreateMap();
+}
+
+/// @brief Move the specific row one section Down
+void GameMap::MoveTilesDown(int i)
+{
+    int x = (2*i)+1;
+    // store first tile in row.
+    int l = ((m_height * m_width) - 1) - ((m_width-1)-x);
+    Tiles last = m_tiles[l];
+    for(int w = l; w > x; w -= m_width){
+        m_tiles[w] = m_tiles[w - m_width];
+        //std::cout << (h * m_width) + w << " ";
+    }
+    //std::cout << x << " " << h << std::endl;
+    m_tiles[x] = last;
+    CreateMap();
+}
+
+/// @brief Move the specific row one section Down
+void GameMap::MoveTilesUp(int i)
+{
+    int x = (2*i)+1;
+    // store first tile in row.
+    int l = ((m_height * m_width) - 1) - ((m_width-1)-x);
+    Tiles first = m_tiles[x];
+    for(int w = x; w < l; w += m_width){
+        m_tiles[w] = m_tiles[w + m_width];
+        //std::cout << (h * m_width) + w << " ";
+    }
+    //std::cout << x << " " << h << std::endl;
+    m_tiles[l] = first;
+    CreateMap();
+}
 

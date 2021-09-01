@@ -118,9 +118,9 @@ int main()
     text.setCharacterSize(40);
     text.setFillColor(sf::Color::White);
 
-    
     sf::Clock timer;
     sf::Clock gameTime;
+    sf::Clock mouseRespond;
 
     GameMap *_map = new GameMap();
     sf::ConvexShape _arrows[4][5];
@@ -185,6 +185,7 @@ int main()
     _playerOne.m_vPos = sf::Vector2f(1.0+_playerOne.fRadius, 1.0+_playerOne.fRadius);
 
     int score = 0;
+    bool isGameOver = false;
     while (window.isOpen())
     {
         /// Event Haneling
@@ -200,55 +201,64 @@ int main()
             delete _map;
             _map = new GameMap();
             _playerOne.m_vPos = sf::Vector2f(1.0+_playerOne.fRadius, 1.0+_playerOne.fRadius);
+            isGameOver = false;
+            score = 0;
             sf::sleep(sf::microseconds(500)); ///< Delay for GUI control.
         }
 
-        /// Control Player Oject
-        sf::Time dt = timer.restart();  ///< Frame rate controller.
-        _playerOne.m_vVel = {0.0, 0.0};
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) _playerOne.m_vVel += {  0.0f, -1.0f};
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) _playerOne.m_vVel += {  0.0f,  1.0f};
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) _playerOne.m_vVel += { -1.0f,  0.0f};
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) _playerOne.m_vVel += {  1.0f,  0.0f};
+        if (!isGameOver){
+            /// Control Player Oject
+            sf::Time dt = timer.restart();  ///< Frame rate controller.
+            _playerOne.m_vVel = {0.0, 0.0};
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) _playerOne.m_vVel += {  0.0f, -1.0f};
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) _playerOne.m_vVel += {  0.0f,  1.0f};
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) _playerOne.m_vVel += { -1.0f,  0.0f};
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) _playerOne.m_vVel += {  1.0f,  0.0f};
 
-        /// Where will object be
-        sf::Vector2f vPotentilPos;
-        vPotentilPos.x = _playerOne.m_vPos.x + _playerOne.m_vVel.x * 5 * dt.asSeconds();
-        vPotentilPos.y = _playerOne.m_vPos.y + _playerOne.m_vVel.y * 5 * dt.asSeconds();
+            /// Where will object be
+            sf::Vector2f vPotentilPos;
+            vPotentilPos.x = _playerOne.m_vPos.x + _playerOne.m_vVel.x * 5 * dt.asSeconds();
+            vPotentilPos.y = _playerOne.m_vPos.y + _playerOne.m_vVel.y * 5 * dt.asSeconds();
 
-        sf::Vector2i currentCell = floor(_playerOne.m_vPos);
-        sf::Vector2i targetCell = floor(vPotentilPos);
-        sf::Vector2i vAreaTL = {std::max( std::min(currentCell.x, targetCell.x)-1, 0), 
-                                std::max( std::min(currentCell.y, targetCell.y)-1, 0)};
-        sf::Vector2i vAreaBR = {std::min( std::max(currentCell.x, targetCell.x)+1, _map->GetTotalWidth()), 
-                                std::min( std::max(currentCell.y, targetCell.y)+1, _map->GetTotalHeigt())};
-        sf::Vector2f vRayToNearest;
-        sf::Vector2i vCell;
+            sf::Vector2i currentCell = floor(_playerOne.m_vPos);
+            sf::Vector2i targetCell = floor(vPotentilPos);
+            sf::Vector2i vAreaTL = {std::max( std::min(currentCell.x, targetCell.x)-1, 0), 
+                                    std::max( std::min(currentCell.y, targetCell.y)-1, 0)};
+            sf::Vector2i vAreaBR = {std::min( std::max(currentCell.x, targetCell.x)+1, _map->GetTotalWidth()), 
+                                    std::min( std::max(currentCell.y, targetCell.y)+1, _map->GetTotalHeigt())};
+            sf::Vector2f vRayToNearest;
+            sf::Vector2i vCell;
 
-        for (vCell.y = vAreaTL.y; vCell.y <= vAreaBR.y; vCell.y++){
-            for (vCell.x = vAreaTL.x; vCell.x <= vAreaBR.x; vCell.x++){
-                char cr =_map->GetTile( vCell.x, vCell.y);
-                if (cr == '#'){
-                    sf::Vector2f vNearestPoint;
-                    vNearestPoint.x = std::max( (float)vCell.x, std::min(vPotentilPos.x, (float)vCell.x+1));
-                    vNearestPoint.y = std::max( (float)vCell.y, std::min(vPotentilPos.y, (float)vCell.y+1));
+            for (vCell.y = vAreaTL.y; vCell.y <= vAreaBR.y; vCell.y++){
+                for (vCell.x = vAreaTL.x; vCell.x <= vAreaBR.x; vCell.x++){
+                    char cr =_map->GetTile( vCell.x, vCell.y);
+                    if (cr == '#'){
+                        sf::Vector2f vNearestPoint;
+                        vNearestPoint.x = std::max( (float)vCell.x, std::min(vPotentilPos.x, (float)vCell.x+1));
+                        vNearestPoint.y = std::max( (float)vCell.y, std::min(vPotentilPos.y, (float)vCell.y+1));
 
-                    sf::Vector2f vRayToNearest = vNearestPoint - vPotentilPos;
-                    float fMag = pow(pow(vRayToNearest.x, 2)+pow(vRayToNearest.y, 2), 0.5);
-                    float fOverlap = _playerOne.fRadius - fMag;
-                    if (std::isnan(fOverlap)) fOverlap = 0;
-                    if (fOverlap > 0)
-                    {
-                        vPotentilPos.x = vPotentilPos.x - (vRayToNearest.x/fMag)*fOverlap;
-                        vPotentilPos.y = vPotentilPos.y - (vRayToNearest.y/fMag)*fOverlap;
+                        sf::Vector2f vRayToNearest = vNearestPoint - vPotentilPos;
+                        float fMag = pow(pow(vRayToNearest.x, 2)+pow(vRayToNearest.y, 2), 0.5);
+                        float fOverlap = _playerOne.fRadius - fMag;
+                        if (std::isnan(fOverlap)) fOverlap = 0;
+                        if (fOverlap > 0)
+                        {
+                            vPotentilPos.x = vPotentilPos.x - (vRayToNearest.x/fMag)*fOverlap;
+                            vPotentilPos.y = vPotentilPos.y - (vRayToNearest.y/fMag)*fOverlap;
+                        }
                     }
                 }
             }
+            if (vPotentilPos.x > 0 && vPotentilPos.x < _map->GetTotalWidth())
+                _playerOne.m_vPos.x = vPotentilPos.x;// - _playerOne.fRadius;
+            if (vPotentilPos.y > 0 && vPotentilPos.y < _map->GetTotalHeigt())
+                _playerOne.m_vPos.y = vPotentilPos.y;//- _playerOne.fRadius;
+
+            if (circleRect(_playerOne.m_vPos.x+_playerOne.fRadius, _playerOne.m_vPos.y+_playerOne.fRadius, _playerOne.fRadius, 
+            _map->GetTotalWidth()-1, _map->GetTotalHeigt()-1, 1, 1)) 
+                isGameOver = true;
         }
-        if (vPotentilPos.x > 0 && vPotentilPos.x < _map->GetTotalWidth())
-            _playerOne.m_vPos.x = vPotentilPos.x;// - _playerOne.fRadius;
-        if (vPotentilPos.y > 0 && vPotentilPos.y < _map->GetTotalHeigt())
-            _playerOne.m_vPos.y = vPotentilPos.y;//- _playerOne.fRadius;
+
         ///< Draw Everyting.
         window.clear();
         
@@ -268,27 +278,57 @@ int main()
         _circl.setFillColor(sf::Color::Red);
         window.draw(_circl);
         
-        //sf::Vector2i _mousePos = sf::Mouse::getPosition(window);
-        // get the current mouse position in the window
+        // get the current mouse position in the window.
         sf::Vector2i pixelPos = sf::Mouse::getPosition(window);
-        // convert it to world coordinates
+        // convert it to world coordinates.
         sf::Vector2f worldPos = window.mapPixelToCoords(pixelPos);
-        for (int j = 0; j < 2; j++)
+        // Draw Arrows and move the map if any arrow is activated.
+        for (int j = 0; j < 4; j++)
             for (int i = 0; i < numarrows; i++)
             {
                 if (triPoint(_arrows[j][i].getPoint(0).x, _arrows[j][i].getPoint(0).y, _arrows[j][i].getPoint(1).x,
                 _arrows[j][i].getPoint(1).y, _arrows[j][i].getPoint(2).x, _arrows[j][i].getPoint(2).y, worldPos.x, worldPos.y)){
                     _arrows[j][i].setFillColor(sf::Color::Red);
                     if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
-                        {
-                            _map->MoveTilesLeft(i);
+                    {
+                        sf::Time dt = mouseRespond.getElapsedTime();  ///< Frame rate controller.
+                        if (dt.asMilliseconds() > 250){
+                            if (!isGameOver)
+                                score++;
+                            switch(j){
+                            case 0:
+                                _map->MoveTilesRight(i);
+                                break;
+                            case 1:
+                                _map->MoveTilesLeft(i);
+                                break;
+                            case 2:
+                                _map->MoveTilesDown(i);
+                                break;
+                            case 3:
+                                _map->MoveTilesUp(i);
+                                break;
+                            }
+                            mouseRespond.restart();
                         }
+                        //sf::sleep(sf::milliseconds(250));
+                    }
                 }
                 else 
                     _arrows[j][i].setFillColor(sf::Color::Green);
                 window.draw(_arrows[j][i]);
             }
 
+        if (!isGameOver){
+            text.setString("Score: " + std::to_string(score));
+            text.setPosition(width-250, 5);
+            window.draw(text);
+        }
+        else {
+            text.setString("Final Score: \r\n" + std::to_string(score) + "\r\nPress down \n\rspace bar\r\nto restart.");
+            text.setPosition(width-250, 5);
+            window.draw(text);
+        }
         window.display();
         
     }

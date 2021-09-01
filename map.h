@@ -20,6 +20,8 @@ enum TileType
     BottomRight
 };
 
+
+/// @brief descriptor of tile.
 class Tiles
 {
 private:
@@ -40,11 +42,12 @@ public:
     void Set(TileType type);
     std::string GetTiles();
     char GetTile(int x, int y);
+    void MakeEnd();
 };
 
 
-// Each icon is 16 by 16 pixels. Each tile will be 48 by 48 pixels.
-// Making a map of 10 by 10 tyles will be a 480 by 480 piexels.
+// Each icon/tile is 16 by 16 pixels. Each region will be 48 by 48 pixels.
+// Making a map of 10 by 10 region will be a 480 by 480 piexels.
 
 class GameMap
 {
@@ -69,8 +72,11 @@ public:
     int GetPxWidth(){ return m_pxWidth;};   ///< Return the width in pixels of the map.
     int GetPxHeight(){ return m_pxHeight;}; ///< Return the height in pixels of the map.
     sf::Sprite& GetStripe(int x, int y);    ///< a strip in of a position x, y in the tile grid.
-    char GetTile(int x, int y);         ///< get te tile as as character.
-    void MoveTilesLeft(int x);
+    char GetTile(int x, int y);         ///< get te tile as character.
+    void MoveTilesLeft(int x);          ///< Move the tiles to the left.
+    void MoveTilesRight(int x);         ///< Move the tiles to the right.
+    void MoveTilesDown(int i);          ///< Move the tiles down.
+    void MoveTilesUp(int i);            ///< Move the tiles up.
 };
 
 #endif
