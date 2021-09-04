@@ -7,10 +7,12 @@
 #include <memory>
 #include "TextureManager.h"
 #include "map.h"
-
+#include <SFML/Audio.hpp>
 
 ///< good old globals.
 TextureManager g_textureManager;
+
+
 
 const float fps = 60;
 const float period = 1000000/fps;
@@ -129,6 +131,12 @@ int main()
     sf::Vector2f _mapOffest = {3.0, 3.0};      
     int co = 0; ///< gernaral purpose counter.
     int numarrows = 0;
+
+    sf::SoundBuffer _buffer;
+    if(!_buffer.loadFromFile("wall-crushing2.wav"))
+        return -1;
+    sf::Sound sound;
+    sound.setBuffer(_buffer);
 
     ///< Arrow positions.
     {
@@ -295,6 +303,8 @@ int main()
                         if (dt.asMilliseconds() > 250){
                             if (!isGameOver)
                                 score++;
+                                sound.play();
+                                //sf::sleep(sf::milliseconds(1000));
                             switch(j){
                             case 0:
                                 _map->MoveTilesRight(i);
